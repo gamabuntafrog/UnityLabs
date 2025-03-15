@@ -12,6 +12,14 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+
+        // Підписуємося на подію програшу
+        if (GameManager.Instance != null)
+        {
+            Debug.Log($"Coins: {GameManager.Instance.Coins}, Lifes: {GameManager.Instance.Lifes}, MaxCoinsCollected: {GameManager.Instance.MaxCoinsCollected}, CollisionsWithDangerTotal: {GameManager.Instance.CollisionsWithDangerTotal}");
+
+            GameManager.Instance.OnGameOver += HandleGameOver;
+        }
     }
 
     void Update()
@@ -51,5 +59,38 @@ public class Player : MonoBehaviour
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log($"Player triggered layer {other.gameObject.layer}, TimeAtStart: {GameManager.Instance.GetTimeElapsed()}");
+
+        if (other.gameObject.layer == 7)
+        {
+            SomeDanger damageObject = other.gameObject.GetComponent<SomeDanger>();
+
+            if (damageObject != null)
+            {
+                GameManager.Instance.DecreaseLifes(damageObject.damage);
+                GameManager.Instance.IncreaseCollisionCount();
+
+                Debug.Log($"lifes now: {GameManager.Instance.Lifes} damage was: {damageObject.damage}");
+                // Destroy(other.gameObject);
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Відписуємося від події, щоб уникнути помилок
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnGameOver -= HandleGameOver;
+        }
+    }
+
+    private void HandleGameOver()
+    {
+        Debug.Log("You lost! Game Over!");
     }
 }

@@ -5,6 +5,8 @@ public class SpiralMovement : MonoBehaviour
     public float radius = 5f;        // Максимальний радіус спіралі
     public float speed = 2f;         // Швидкість обертання
     public float spiralSpeed = 0.5f; // Швидкість збільшення радіуса
+    public float yVelocity = 1f; // Швидкість збільшення радіуса
+
     public bool returnToStart = true; // Чи повертатися в початкове положення
     
     private Vector3 startPosition;
@@ -45,7 +47,7 @@ public class SpiralMovement : MonoBehaviour
 
         float x = Mathf.Cos(angle) * currentRadius;
         float z = Mathf.Sin(angle) * currentRadius;
-        transform.position = startPosition + new Vector3(x, 0, z);
+        transform.position = startPosition + new Vector3(x, yVelocity += Time.deltaTime, z);
     }
 
     void ReturnToStart()
